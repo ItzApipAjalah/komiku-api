@@ -26,7 +26,7 @@ const popularService = {
       }
       
       // Construct the API URL
-      const apiUrl = `https://api.komiku.id/other/hot/page/${page}/?orderby=modified&category_name=${category}`;
+      const apiUrl = `https://api.komiku.id/other/hot/page/${page}/?orderby=meta_value_num&category_name=${category}`;
       
       // Fetch the popular manga page
       const response = await axios.get(apiUrl, {
