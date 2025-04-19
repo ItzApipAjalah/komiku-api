@@ -92,9 +92,9 @@ const lastUpdateService = {
         const type = typeMatch ? typeMatch[1] : '';
         const genre = typeMatch ? typeMatch[2] : '';
         
-        // Extract stats
+        // Extract stats - Updated regex to match the new format
         const statsText = $element.find('.judul2').text().trim();
-        const statsMatch = statsText.match(/(\d+(?:\.\d+)?(?:jt|rb)?)\s*x\s*•\s*(\d+)\s*(\w+)(?:\s*•\s*(\w+))?/);
+        const statsMatch = statsText.match(/(\d+(?:\.\d+)?(?:jt|rb)?)\s*pembaca\s*•\s*(\d+)\s*(\w+)(?:\s*lalu)?(?:\s*•\s*(\w+))?/);
         const views = statsMatch ? statsMatch[1] : '';
         const timeAgo = statsMatch ? `${statsMatch[2]} ${statsMatch[3]}` : '';
         const isColored = statsMatch && statsMatch[4] === 'Berwarna';
