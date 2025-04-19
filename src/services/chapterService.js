@@ -59,9 +59,15 @@ const chapterService = {
         });
       });
       
-      // Extract navigation links
-      const prevChapterUrl = $('.prev a').attr('href');
-      const nextChapterUrl = $('.next a').attr('href');
+      // Extract navigation links from botmenu
+      const botmenu = $('.botmenu .nxpr');
+      const prevChapterUrl = botmenu.find('a.rl:first-child').attr('href');
+      const chapterListUrl = botmenu.find('a:not(.rl)').attr('href');
+      const nextChapterUrl = botmenu.find('a.rl:last-child').attr('href');
+      
+      // Extract chapter titles for navigation
+      const prevChapterTitle = botmenu.find('a.rl:first-child').attr('title');
+      const nextChapterTitle = botmenu.find('a.rl:last-child').attr('title');
       
       // Return chapter details and images
       return {
@@ -71,8 +77,15 @@ const chapterService = {
         readDirection,
         images,
         navigation: {
-          prev: prevChapterUrl ? `${BASE_URL}${prevChapterUrl}` : null,
-          next: nextChapterUrl ? `${BASE_URL}${nextChapterUrl}` : null
+          prev: {
+            url: prevChapterUrl ? `${BASE_URL}${prevChapterUrl}` : null,
+            title: prevChapterTitle || null
+          },
+          chapterList: chapterListUrl ? `${BASE_URL}${chapterListUrl}` : null,
+          next: {
+            url: nextChapterUrl ? `${BASE_URL}${nextChapterUrl}` : null,
+            title: nextChapterTitle || null
+          }
         }
       };
     } catch (error) {
