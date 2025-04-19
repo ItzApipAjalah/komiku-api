@@ -45,7 +45,19 @@ const recommendationService = {
           // Extract manga details
           const title = $element.find('h3 a').text().trim();
           const url = $element.find('h3 a').attr('href');
-          const imageUrl = $element.find('.ls2v img').attr('src');
+          
+          // Handle lazy-loaded images
+          const $img = $element.find('.ls2v img');
+          let imageUrl = '';
+          
+          if ($img.hasClass('lazy')) {
+            // If image has lazy class, use data-src attribute
+            imageUrl = $img.attr('data-src');
+          } else {
+            // Otherwise use src attribute
+            imageUrl = $img.attr('src');
+          }
+          
           const genre = $element.find('.ls2t').text().trim();
           const latestChapter = {
             title: $element.find('.ls2l').text().trim(),
