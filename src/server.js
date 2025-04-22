@@ -16,6 +16,13 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/api', routes);
 
+// Add new route for komikkuya URL
+app.get('/komikkuya', (req, res) => {
+  res.json({
+    url: 'https://komikkuya.my.id/'
+  });
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
