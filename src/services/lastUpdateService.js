@@ -26,7 +26,7 @@ const lastUpdateService = {
       }
       
       // Construct the API URL - using the correct format for Komiku
-      const apiUrl = `https://api.komiku.id/manga/page/${page}/?category_name=${category}`;
+      const apiUrl = `https://api.komiku.id/manga/page/${page}/?orderby=meta_value_num&tipe=${category}`;
       
       // Fetch the last update page
       const response = await axios.get(apiUrl, {
