@@ -47,7 +47,7 @@ const searchService = {
       }
       
       // First, get the search page to get any necessary tokens or cookies
-      const searchPageUrl = `${BASE_URL}/?post_type=manga&s=${encodeURIComponent(query)}`;
+      const searchPageUrl = `${BASE_URL}?post_type=manga&s=${encodeURIComponent(query)}`;
       console.log('Search page URL:', searchPageUrl);
       
       const searchPageResponse = await axios.get(searchPageUrl, {
