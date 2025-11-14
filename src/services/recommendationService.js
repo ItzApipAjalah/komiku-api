@@ -33,7 +33,7 @@ const recommendationService = {
       const recommendations = [];
       
       // Find the recommendations section
-      const recommendationsSection = $('.perapih:contains("Rekomendasi Komiku")');
+      const recommendationsSection = $('.perapih:contains("Peringkat Komiku")');
       
       if (recommendationsSection.length) {
         // Find all manga entries in the recommendations section
