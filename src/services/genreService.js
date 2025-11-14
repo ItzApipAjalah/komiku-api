@@ -27,7 +27,7 @@ const genreService = {
       }
       
       // Construct the API URL
-      const apiUrl = `https://api.komiku.id/genre/${genre}/page/${page}/?orderby=meta_value_num&category_name=${category}`;
+      const apiUrl = `https://api.komiku.id/genre/${genre}/page/${page}/?orderby=modified&tipe=${category}`;
       
       // Fetch the genre manga page
       const response = await axios.get(apiUrl, {
