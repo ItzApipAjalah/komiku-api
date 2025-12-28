@@ -5,6 +5,7 @@ const mangaController = require('../controllers/mangaController');
 const chapterController = require('../controllers/chapterController');
 const recommendationController = require('../controllers/recommendationController');
 const popularController = require('../controllers/popularController');
+const hotController = require('../controllers/hotController');
 const genreController = require('../controllers/genreController');
 const lastUpdateController = require('../controllers/lastUpdateController');
 
@@ -22,6 +23,9 @@ router.get('/recommendations', recommendationController.getRecommendations);
 
 // Popular manga routes
 router.get('/popular', popularController.getPopularManga);
+
+// Hot manga routes
+router.get('/hot', hotController.getHotManga);
 
 // Genre routes
 router.get('/genres', genreController.getAllGenres);

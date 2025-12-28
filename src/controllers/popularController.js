@@ -11,12 +11,13 @@ const popularController = {
    */
   getPopularManga: async (req, res) => {
     try {
-      // Get category and page from query parameters
+      // Get category, page, and sorttime from query parameters
       const category = req.query.category || 'manga';
       const page = parseInt(req.query.page) || 1;
-      
-      const popularData = await popularService.getPopularManga(category, page);
-      
+      const sorttime = req.query.sorttime || 'all';
+
+      const popularData = await popularService.getPopularManga(category, page, sorttime);
+
       res.status(200).json({
         success: true,
         data: popularData
