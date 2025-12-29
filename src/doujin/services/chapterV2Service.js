@@ -1,24 +1,49 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-// FlareSolverr URL - update this to your Ubuntu server IP
+// FlareSolverr URL
 const FLARESOLVERR_URL = process.env.FLARESOLVERR_URL || 'https://dcdn.komikkuya.my.id/v1';
 const MANHWADESU_BASE_URL = 'https://manhwadesu.io';
 
+// Simple in-memory cache
+const cache = new Map();
+const CACHE_TTL = 60 * 60 * 24 * 7 * 1000; // 1 week in milliseconds
+
 // Retry settings
 const MAX_RETRIES = 3;
-const FLARESOLVERR_TIMEOUT = 120000; // 120 seconds
+const FLARESOLVERR_TIMEOUT = 120000;
 
 /**
  * Service for handling chapter view operations on ManhwaDesu (V2)
- * Uses FlareSolverr to bypass Cloudflare with retry logic
+ * Uses FlareSolverr to bypass Cloudflare with in-memory caching
  */
 const chapterV2Service = {
     /**
+     * Get from cache
+     */
+    getFromCache: (key) => {
+        const cached = cache.get(key);
+        if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+            console.log('Cache HIT:', key);
+            return cached.data;
+        }
+        if (cached) {
+            cache.delete(key); // Expired
+        }
+        console.log('Cache MISS:', key);
+        return null;
+    },
+
+    /**
+     * Save to cache
+     */
+    saveToCache: (key, data) => {
+        cache.set(key, { data, timestamp: Date.now() });
+        console.log('Cache SAVED:', key, '(TTL: 1 week)');
+    },
+
+    /**
      * Make request to FlareSolverr with retry
-     * @param {string} url - URL to fetch
-     * @param {number} attempt - Current attempt number
-     * @returns {Promise<string>} - HTML content
      */
     fetchWithRetry: async (url, attempt = 1) => {
         try {
@@ -32,7 +57,7 @@ const chapterV2Service = {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                timeout: FLARESOLVERR_TIMEOUT + 30000 // Extra 30s for network
+                timeout: FLARESOLVERR_TIMEOUT + 30000
             });
 
             if (response.data.status !== 'ok') {
@@ -54,9 +79,7 @@ const chapterV2Service = {
     },
 
     /**
-     * Get chapter content by slug using FlareSolverr
-     * @param {string} slug - Chapter slug (e.g., wireless-onahole-chapter-2)
-     * @returns {Promise<Object>} - Chapter content with images
+     * Get chapter content by slug using FlareSolverr with caching
      */
     getChapter: async (slug) => {
         try {
@@ -64,12 +87,18 @@ const chapterV2Service = {
                 throw new Error('Slug is required');
             }
 
-            // Clean slug if it's a full URL
+            // Clean slug
             let cleanSlug = slug;
             if (slug.includes('komikdewasa.id/baca/')) {
                 cleanSlug = slug.split('/baca/')[1].split('/')[0].split('?')[0];
             } else if (slug.includes('manhwadesu.io/')) {
                 cleanSlug = slug.split('manhwadesu.io/')[1].split('/')[0].split('?')[0];
+            }
+
+            // Check cache first
+            const cached = chapterV2Service.getFromCache(cleanSlug);
+            if (cached) {
+                return cached;
             }
 
             const chapterUrl = `${MANHWADESU_BASE_URL}/${cleanSlug}/`;
@@ -123,7 +152,7 @@ const chapterV2Service = {
 
             console.log(`Found ${images.length} images`);
 
-            return {
+            const result = {
                 slug: cleanSlug,
                 title: h1Title || pageTitle,
                 source: 'manhwadesu.io',
@@ -131,8 +160,15 @@ const chapterV2Service = {
                 prevChapter,
                 nextChapter,
                 totalImages: images.length,
-                images
+                images,
+                cached: true,
+                cachedAt: new Date().toISOString()
             };
+
+            // Save to cache
+            chapterV2Service.saveToCache(cleanSlug, result);
+
+            return result;
         } catch (error) {
             console.error('Error getting chapter on ManhwaDesu (V2):', error.message);
             throw new Error(`Failed to get chapter: ${error.message}`);
