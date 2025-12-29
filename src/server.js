@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const routes = require('./routes');
 const asiaRoutes = require('./asia/routes');
+const internationalRoutes = require('./international/routes');
 
 // Load environment variables
 dotenv.config();
@@ -17,8 +18,11 @@ app.use(express.urlencoded({ extended: true }));
 // Routes - Komiku.id (Original)
 app.use('/api', routes);
 
-// Routes - Komiku.asia (New source)
+// Routes - WestManga (Asia)
 app.use('/api/asia', asiaRoutes);
+
+// Routes - WeebCentral (International)
+app.use('/api/international', internationalRoutes);
 
 // Add new route for komikkuya URL
 app.get('/komikkuya', (req, res) => {
