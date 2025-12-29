@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const routes = require('./routes');
+const asiaRoutes = require('./asia/routes');
 
 // Load environment variables
 dotenv.config();
@@ -13,8 +14,11 @@ const PORT = process.env.PORT || 4000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
+// Routes - Komiku.id (Original)
 app.use('/api', routes);
+
+// Routes - Komiku.asia (New source)
+app.use('/api/asia', asiaRoutes);
 
 // Add new route for komikkuya URL
 app.get('/komikkuya', (req, res) => {
