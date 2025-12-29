@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const routes = require('./routes');
 const asiaRoutes = require('./asia/routes');
 const internationalRoutes = require('./international/routes');
+const doujinRoutes = require('./doujin/routes');
 
 // Load environment variables
 dotenv.config();
@@ -23,6 +24,9 @@ app.use('/api/asia', asiaRoutes);
 
 // Routes - WeebCentral (International)
 app.use('/api/international', internationalRoutes);
+
+// Routes - KomikDewasa (Doujin)
+app.use('/api/doujin', doujinRoutes);
 
 // Add new route for komikkuya URL
 app.get('/komikkuya', (req, res) => {
