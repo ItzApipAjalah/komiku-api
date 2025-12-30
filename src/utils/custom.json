@@ -1,0 +1,104 @@
+{
+	"success": true,
+	"data": [
+		{
+			"title": "Horimiya",
+			"url": "https://komiku.org/manga/horimiya/",
+			"imageUrl": "https://raw.githubusercontent.com/ItzApipAjalah/ItzApipAjalah/refs/heads/main/image/horimiya.jpg",
+			"genre": "Romance",
+			"latestChapter": {
+				"title": "Chapter 124",
+				"url": "https://komiku.org/horimiya-chapter-124/"
+			},
+			"isHot": true
+		},
+		{
+			"title": "Sono Bisque Doll wa Koi wo suru",
+			"url": "https://komiku.org/manga/sono-bisque-doll-wa-koi-wo-suru/",
+			"imageUrl": "https://raw.githubusercontent.com/ItzApipAjalah/ItzApipAjalah/refs/heads/main/image/sono.jpg",
+			"genre": "Romance",
+			"latestChapter": {
+				"title": "Chapter 115",
+				"url": "https://komiku.org/sono-bisque-doll-wa-koi-wo-suru-chapter-115/"
+			},
+			"isHot": true
+		},
+		{
+			"title": "8Kaijuu",
+			"url": "https://komiku.org/manga/8kaijuu/",
+			"imageUrl": "https://raw.githubusercontent.com/ItzApipAjalah/ItzApipAjalah/refs/heads/main/image/kaiju.jpg",
+			"genre": "Aksi",
+			"latestChapter": {
+				"title": "Chapter 129",
+				"url": "https://komiku.org/8kaijuu-chapter-129/"
+			},
+			"isHot": true
+		},
+		{
+			"title": "Solo Leveling",
+			"url": "https://komiku.org//manga/solo-leveling-id/",
+			"imageUrl": "https://raw.githubusercontent.com/ItzApipAjalah/ItzApipAjalah/refs/heads/main/image/solo-leveling.jpg",
+			"genre": "Fantasi",
+			"latestChapter": {
+				"title": "Chapter 180",
+				"url": "https://komiku.org//solo-leveling-chapter-180/"
+			},
+			"isHot": true
+		},
+		{
+			"title": "Kimetsu no Yaiba",
+			"url": "https://komiku.org//manga/kimetsu-no-yaiba-indonesia/",
+			"imageUrl": "https://raw.githubusercontent.com/ItzApipAjalah/ItzApipAjalah/refs/heads/main/image/kny.jpg",
+			"genre": "Aksi",
+			"latestChapter": {
+				"title": "Chapter 205.6",
+				"url": "https://komiku.org//kimetsu-no-yaiba-chapter-205-6/"
+			},
+			"isHot": true
+		},
+		{
+			"title": "Chainsaw Man",
+			"url": "https://komiku.org/manga/123213-chainsaw-man/",
+			"imageUrl": "https://raw.githubusercontent.com/ItzApipAjalah/ItzApipAjalah/refs/heads/main/image/chainsaw.jpg",
+			"genre": "Aksi",
+			"latestChapter": {
+				"title": "Chapter 224",
+				"url": "https://komiku.org/chainsaw-man-chapter-224/"
+			},
+			"isHot": true
+		},
+		{
+			"title": "One Punch Man",
+			"url": "https://komiku.org//manga/manga-one-punch-man/",
+			"imageUrl": "https://thumbnail.komiku.org/uploads/manga/manga-one-punch-man/manga_thumbnail-Komik-One-Punch-Man.jpg?resize=240,150",
+			"genre": "Aksi",
+			"latestChapter": {
+				"title": "Chapter 273",
+				"url": "https://komiku.org//one-punch-man-chapter-273/"
+			},
+			"isHot": true
+		},
+		{
+			"title": "The Beginning After The End",
+			"url": "https://komiku.org/manga/the-beginning-after-the-end/",
+			"imageUrl": "https://raw.githubusercontent.com/ItzApipAjalah/ItzApipAjalah/refs/heads/main/image/the-beginning-after-the-end.jpg",
+			"genre": "Aksi",
+			"latestChapter": {
+				"title": "Chapter 225",
+				"url": "https://komiku.org/the-beginning-after-the-end-chapter-225/"
+			},
+			"isHot": true
+		},
+		{
+			"title": "Wind Breaker",
+			"url": "https://komiku.org/manga/wind-breaker-nii-satoru-indo/",
+			"imageUrl": "https://raw.githubusercontent.com/ItzApipAjalah/ItzApipAjalah/refs/heads/main/image/wind-breaker.jpg",
+			"genre": "Aksi",
+			"latestChapter": {
+				"title": "Chapter 202 R",
+				"url": "https://komiku.org/wind-breaker-nii-satoru-chapter-202-r/"
+			},
+			"isHot": true
+		}
+	]
+}

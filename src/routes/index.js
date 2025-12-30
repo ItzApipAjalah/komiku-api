@@ -8,6 +8,7 @@ const popularController = require('../controllers/popularController');
 const hotController = require('../controllers/hotController');
 const genreController = require('../controllers/genreController');
 const lastUpdateController = require('../controllers/lastUpdateController');
+const customData = require('../utils/custom.json');
 
 // Search routes
 router.get('/search', searchController.search);
@@ -33,5 +34,10 @@ router.get('/genre', genreController.getMangaByGenre);
 
 // Last update routes
 router.get('/last-update', lastUpdateController.getLastUpdates);
+
+// Custom data route
+router.get('/custom', (req, res) => {
+    res.status(200).json(customData);
+});
 
 module.exports = router; 
