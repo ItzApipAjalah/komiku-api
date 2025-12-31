@@ -18,14 +18,12 @@ const chapterService = {
             }
 
             // Extract chapter ID from URL
-            // URL format: https://weebcentral.com/chapters/01KCKV3FH63TMR606481FDZ06P
             let chapterId = url;
             if (url.includes('/chapters/')) {
                 chapterId = url.split('/chapters/')[1].split('/')[0].split('?')[0];
             }
 
             const chapterUrl = `${WEEB_BASE_URL}/chapters/${chapterId}`;
-            // IMPORTANT: reading_style parameter is REQUIRED, otherwise returns 400
             const imagesUrl = `${WEEB_BASE_URL}/chapters/${chapterId}/images?reading_style=long_strip`;
 
             const headers = {
@@ -44,7 +42,7 @@ const chapterService = {
             const $ = cheerio.load(chapterResponse.data);
             const $images = cheerio.load(imagesResponse.data);
 
-            // Extract manga info
+            // Extract manga info and series ID
             let mangaTitle = '';
             let mangaUrl = '';
             let seriesId = '';
@@ -65,19 +63,63 @@ const chapterService = {
             let chapterNumber = '';
             $('button span, span').each((i, el) => {
                 const text = $(el).text().trim();
-                if (text.match(/^Chapter\s+\d+/i) && !chapterNumber) {
+                if (text.match(/^Chapter\s+[\d.]+/i) && !chapterNumber) {
                     chapterNumber = text;
                     return false;
                 }
             });
 
-            // Extract all images from the images response
+            // Extract prev/next from chapter-select hx-get attribute
+            let prevChapter = null;
+            let nextChapter = null;
+
+            // Find the chapter-select button to get current_chapter parameter
+            const chapterSelectBtn = $('button[hx-get*="/chapter-select"]');
+            if (chapterSelectBtn.length > 0 && seriesId) {
+                // Fetch the full chapter list
+                try {
+                    const chapterListUrl = `${WEEB_BASE_URL}/series/${seriesId}/full-chapter-list`;
+                    const listResponse = await axios.get(chapterListUrl, { headers });
+                    const $list = cheerio.load(listResponse.data);
+
+                    // Find all chapter links
+                    const chapters = [];
+                    $list('a[href*="/chapters/"]').each((i, el) => {
+                        const href = $list(el).attr('href');
+                        if (href) {
+                            const id = href.split('/chapters/')[1]?.split('/')[0]?.split('?')[0];
+                            if (id) {
+                                chapters.push({
+                                    chapterId: id,
+                                    url: `${WEEB_BASE_URL}/chapters/${id}`
+                                });
+                            }
+                        }
+                    });
+
+                    // Find current chapter index
+                    const currentIndex = chapters.findIndex(c => c.chapterId === chapterId);
+                    if (currentIndex !== -1) {
+                        // Chapters are usually in descending order (newest first)
+                        // So "prev" is the one after current (older), "next" is the one before (newer)
+                        if (currentIndex < chapters.length - 1) {
+                            prevChapter = chapters[currentIndex + 1];
+                        }
+                        if (currentIndex > 0) {
+                            nextChapter = chapters[currentIndex - 1];
+                        }
+                    }
+                } catch (listError) {
+                    console.log('Could not fetch chapter list for prev/next:', listError.message);
+                }
+            }
+
+            // Extract all images
             const images = [];
             $images('img').each((index, element) => {
                 const $img = $images(element);
                 const src = $img.attr('src');
 
-                // Filter only actual manga page images
                 if (src && !src.includes('/static/') && !src.includes('broken_image')) {
                     const alt = $img.attr('alt');
                     const width = $img.attr('width');
@@ -100,6 +142,8 @@ const chapterService = {
                 mangaUrl,
                 seriesId,
                 url: chapterUrl,
+                prevChapter,
+                nextChapter,
                 totalImages: images.length,
                 images
             };

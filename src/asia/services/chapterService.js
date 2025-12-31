@@ -3,14 +3,8 @@ const { WEST_BASE_URL } = require('../utils/constants');
 
 /**
  * Service for handling chapter view operations on WestManga
- * Uses direct API endpoint
  */
 const chapterService = {
-    /**
-     * Get chapter content by URL or slug
-     * @param {string} url - Full URL or slug of the chapter
-     * @returns {Promise<Object>} - Chapter content with images
-     */
     getChapter: async (url) => {
         try {
             if (!url || url.trim() === '') {
@@ -23,11 +17,10 @@ const chapterService = {
                 slug = url.split('/view/')[1].split('/')[0].split('?')[0];
             }
 
-            // Fetch chapter content from API
             const apiUrl = `https://data.westmanga.me/api/v/${slug}`;
             const response = await axios.get(apiUrl, {
                 headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
                     'Accept': 'application/json',
                     'Referer': WEST_BASE_URL,
                     'Origin': WEST_BASE_URL
@@ -36,31 +29,90 @@ const chapterService = {
 
             const chapterData = response.data.data;
 
-            // Build response
+            // Extract content info (comic info is in 'content' object)
+            const content = chapterData.content || {};
+            const contentSlug = content.slug;
+            const contentTitle = content.title;
+            const contentId = content.id;
+
+            // Extract prev/next from chapters array
+            let prevChapter = null;
+            let nextChapter = null;
+
+            const chapters = chapterData.chapters || [];
+            if (chapters.length > 0) {
+                // Find current chapter in the array
+                const currentIndex = chapters.findIndex(c => c.slug === slug);
+
+                if (currentIndex !== -1) {
+                    // Chapters array order: check if ascending or descending
+                    // Usually: index 0 = oldest, last index = newest (ascending)
+                    // Or: index 0 = newest, last index = oldest (descending)
+
+                    // Check order by comparing numbers
+                    const isAscending = chapters.length > 1 &&
+                        parseFloat(chapters[0]?.number || 0) < parseFloat(chapters[chapters.length - 1]?.number || 0);
+
+                    if (isAscending) {
+                        // Ascending: prev = lower index, next = higher index
+                        if (currentIndex > 0) {
+                            const prev = chapters[currentIndex - 1];
+                            prevChapter = {
+                                slug: prev.slug,
+                                number: prev.number,
+                                title: `Chapter ${prev.number}`,
+                                url: `${WEST_BASE_URL}/view/${prev.slug}`
+                            };
+                        }
+                        if (currentIndex < chapters.length - 1) {
+                            const next = chapters[currentIndex + 1];
+                            nextChapter = {
+                                slug: next.slug,
+                                number: next.number,
+                                title: `Chapter ${next.number}`,
+                                url: `${WEST_BASE_URL}/view/${next.slug}`
+                            };
+                        }
+                    } else {
+                        // Descending: prev = higher index (older), next = lower index (newer)
+                        if (currentIndex < chapters.length - 1) {
+                            const prev = chapters[currentIndex + 1];
+                            prevChapter = {
+                                slug: prev.slug,
+                                number: prev.number,
+                                title: `Chapter ${prev.number}`,
+                                url: `${WEST_BASE_URL}/view/${prev.slug}`
+                            };
+                        }
+                        if (currentIndex > 0) {
+                            const next = chapters[currentIndex - 1];
+                            nextChapter = {
+                                slug: next.slug,
+                                number: next.number,
+                                title: `Chapter ${next.number}`,
+                                url: `${WEST_BASE_URL}/view/${next.slug}`
+                            };
+                        }
+                    }
+                }
+            }
+
             return {
                 id: chapterData.id,
                 slug: chapterData.slug,
                 number: chapterData.number,
                 title: chapterData.title || `Chapter ${chapterData.number}`,
-                contentId: chapterData.content_id,
-                contentSlug: chapterData.content_slug,
-                contentTitle: chapterData.content_title,
+                contentId: contentId,
+                contentSlug: contentSlug,
+                contentTitle: contentTitle,
                 url: `${WEST_BASE_URL}/view/${chapterData.slug}`,
-                comicUrl: `${WEST_BASE_URL}/comic/${chapterData.content_slug}`,
+                comicUrl: contentSlug ? `${WEST_BASE_URL}/comic/${contentSlug}` : null,
                 createdAt: chapterData.created_at?.formatted,
                 updatedAt: chapterData.updated_at?.formatted,
-                prevChapter: chapterData.prev_chapter ? {
-                    slug: chapterData.prev_chapter.slug,
-                    number: chapterData.prev_chapter.number,
-                    url: `${WEST_BASE_URL}/view/${chapterData.prev_chapter.slug}`
-                } : null,
-                nextChapter: chapterData.next_chapter ? {
-                    slug: chapterData.next_chapter.slug,
-                    number: chapterData.next_chapter.number,
-                    url: `${WEST_BASE_URL}/view/${chapterData.next_chapter.slug}`
-                } : null,
-                totalImages: (chapterData.images || chapterData.chapter_images || []).length,
-                images: chapterData.images || chapterData.chapter_images || []
+                prevChapter,
+                nextChapter,
+                totalImages: (chapterData.images || []).length,
+                images: chapterData.images || []
             };
         } catch (error) {
             console.error('Error getting chapter on WestManga:', error);
