@@ -19,15 +19,15 @@ const lastUpdateService = {
       if (!validCategories.includes(category)) {
         throw new Error(`Invalid category. Must be one of: ${validCategories.join(', ')}`);
       }
-      
+
       // Validate page
       if (page < 1) {
         page = 1;
       }
-      
+
       // Construct the API URL - using the correct format for Komiku
       const apiUrl = `https://api.komiku.org/manga/page/${page}/?orderby=modified&tipe=${category}`;
-      
+
       // Fetch the last update page
       const response = await axios.get(apiUrl, {
         headers: {
@@ -39,18 +39,18 @@ const lastUpdateService = {
           'Cache-Control': 'max-age=0'
         }
       });
-      
+
       const html = response.data;
-      
+
       // Parse the HTML
       const $ = cheerio.load(html);
-      
+
       // Extract manga list
       const mangaList = [];
-      
+
       // Find all manga entries
       const mangaElements = $('.bge');
-      
+
       // If no manga elements found, check if we're on the last page
       if (mangaElements.length === 0) {
         // Check if there's a previous page link to determine if this is a valid page
@@ -66,18 +66,18 @@ const lastUpdateService = {
           };
         }
       }
-      
+
       mangaElements.each((index, element) => {
         const $element = $(element);
-        
+
         // Extract manga details
         const title = $element.find('.kan h3').text().trim();
         const url = $element.find('.bgei a').attr('href');
-        
+
         // Handle lazy-loaded images
         const $img = $element.find('.bgei img');
         let imageUrl = '';
-        
+
         if ($img.hasClass('lazy')) {
           // If image has lazy class, use data-src attribute
           imageUrl = $img.attr('data-src');
@@ -85,37 +85,38 @@ const lastUpdateService = {
           // Otherwise use src attribute
           imageUrl = $img.attr('src');
         }
-        
+
         // Extract type and genre
         const typeInfoText = $element.find('.tpe1_inf').text().trim();
         const typeMatch = typeInfoText.match(/^(\w+)\s+(.+)$/);
         const type = typeMatch ? typeMatch[1] : '';
         const genre = typeMatch ? typeMatch[2] : '';
-        
-        // Extract stats - Updated regex to match the new format
+
+        // Extract stats - Format: "19.2jt pembaca | 1 jam lalu"
         const statsText = $element.find('.judul2').text().trim();
-        const statsMatch = statsText.match(/(\d+(?:\.\d+)?(?:jt|rb)?)\s*pembaca\s*•\s*(\d+)\s*(\w+)(?:\s*lalu)?(?:\s*•\s*(\w+))?/);
+        // Match: views + "pembaca |" + number + time unit + "lalu"
+        const statsMatch = statsText.match(/([\d.,]+(?:jt|rb)?)\s*pembaca\s*\|\s*(.+?)\s*lalu/i);
         const views = statsMatch ? statsMatch[1] : '';
-        const timeAgo = statsMatch ? `${statsMatch[2]} ${statsMatch[3]}` : '';
-        const isColored = statsMatch && statsMatch[4] === 'Berwarna';
-        
+        const timeAgo = statsMatch ? statsMatch[2].trim() : '';
+        const isColored = statsText.toLowerCase().includes('berwarna');
+
         // Extract description
         const description = $element.find('.kan p').text().trim();
-        
+
         // Extract chapter information
         const firstChapter = {
           title: $element.find('.new1:first-child span:last-child').text().trim(),
           url: $element.find('.new1:first-child a').attr('href')
         };
-        
+
         const latestChapter = {
           title: $element.find('.new1:last-child span:last-child').text().trim(),
           url: $element.find('.new1:last-child a').attr('href')
         };
-        
+
         // Extract update status
         const updateStatus = $element.find('.up').text().trim();
-        
+
         // Add to manga list
         mangaList.push({
           title,
@@ -140,10 +141,10 @@ const lastUpdateService = {
           updateStatus
         });
       });
-      
+
       // Check if there's a next page
       const hasNextPage = $('.pagination .next').length > 0;
-      
+
       return {
         category,
         page,
